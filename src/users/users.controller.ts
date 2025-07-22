@@ -13,11 +13,17 @@ export class UsersController {
 
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User | null> {
-    return this.usersService.findOne(+id); // ✅ Uses service, not repository
+    return this.usersService.findOne(+id);
   }
 
   @Post()
   create(@Body() userData: Partial<User>): Promise<User> {
     return this.usersService.create(userData);
+  }
+
+  // ✅ NEW: Google login endpoint
+  @Post('google-login')
+  async loginWithGoogle(@Body('accessToken') accessToken: string): Promise<User> {
+    return this.usersService.loginWithGoogle(accessToken);
   }
 }

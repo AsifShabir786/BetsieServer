@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'; // ✅ Import TypeOrmModule
-import { UsersService } from './users.service';
+import { HttpModule } from '@nestjs/axios';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from './user.entity';
 import { UsersController } from './users.controller';
-import { User } from './user.entity'; // ✅ Import User entity
+import { UsersService } from './users.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])], // ✅ Register User entity
+  imports: [TypeOrmModule.forFeature([User]), HttpModule], // 👈 Added HttpModule
   providers: [UsersService],
   controllers: [UsersController],
 })
