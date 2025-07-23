@@ -26,4 +26,13 @@ export class UsersController {
   async loginWithGoogle(@Body('accessToken') accessToken: string): Promise<User> {
     return this.usersService.loginWithGoogle(accessToken);
   }
+  @Post('facebook-login')
+async loginWithFacebook(@Body('accessToken') accessToken: string): Promise<User> {
+  return this.usersService.loginWithFacebook(accessToken);
+}
+@Post('apple-login')
+async loginWithApple(@Body('idToken') idToken: string): Promise<User> {
+  return this.usersService.loginWithApple(idToken);
+}
+
 }
