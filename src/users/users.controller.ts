@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-
-@Controller('users')
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+@ApiTags('Users') // 👈 For grouping in Swagger UI
+@ApiBearerAuth()  // 👈 If you use JWT
+ @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -22,14 +24,16 @@ export class UsersController {
   }
 
   // ✅ NEW: Google login endpoint
-  @Post('google-login')
-  async loginWithGoogle(@Body('accessToken') accessToken: string): Promise<User> {
-    return this.usersService.loginWithGoogle(accessToken);
-  }
-  @Post('facebook-login')
-async loginWithFacebook(@Body('accessToken') accessToken: string): Promise<User> {
+@Post('google-login')
+async loginWithGoogle(@Body('accessToken') accessToken: string): Promise<{ user: User; token: string }> {
+  return this.usersService.loginWithGoogle(accessToken);
+}
+
+@Post('facebook-login')
+async loginWithFacebook(@Body('accessToken') accessToken: string): Promise<{ user: User; token: string }> {
   return this.usersService.loginWithFacebook(accessToken);
 }
+
 @Post('apple-login')
 async loginWithApple(@Body('idToken') idToken: string): Promise<User> {
   return this.usersService.loginWithApple(idToken);

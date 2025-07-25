@@ -6,13 +6,15 @@ import { Repository } from 'typeorm';
  import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
  import * as appleSigninAuth from 'apple-signin-auth';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(
+   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    private readonly httpService: HttpService, // ✅ Inject HttpService
+    private readonly httpService: HttpService,
+    private readonly jwtService: JwtService, // ✅ Add this
   ) {}
 
   findAll(): Promise<User[]> {
@@ -28,8 +30,7 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  // ✅ NEW: Login with Google
-  async loginWithGoogle(accessToken: string): Promise<User> {
+  async loginWithGoogle(accessToken: string): Promise<{ user: User; token: string }> {
     try {
       const googleUserInfo$ = this.httpService.get(
         'https://www.googleapis.com/oauth2/v3/userinfo',
@@ -64,26 +65,29 @@ export class UsersService {
       user.lastLogin = new Date();
       await this.userRepository.save(user);
 
-      return user;
+      const token = this.jwtService.sign({
+        id: user.id,
+        email: user.email,
+        userType: user.userType,
+      });
+
+      return { user, token };
     } catch (err) {
       console.error('Google login error:', err);
       throw new HttpException('Failed to login with Google', 401);
     }
   }
-  async loginWithFacebook(accessToken: string): Promise<User> {
+ 
+async loginWithFacebook(accessToken: string): Promise<{ user: User; token: string }> {
   try {
-    // Facebook Graph API to fetch user info
     const fbUserInfo$ = this.httpService.get(
       `https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token=${accessToken}`,
     );
 
     const { data } = await lastValueFrom(fbUserInfo$);
-
     const { email, name, picture } = data;
 
-    if (!email) {
-      throw new HttpException('Facebook account does not have an email', 400);
-    }
+    if (!email) throw new HttpException('Facebook account does not have an email', 400);
 
     let user = await this.userRepository.findOne({ where: { email } });
 
@@ -97,19 +101,21 @@ export class UsersService {
         isActive: true,
         createdAt: new Date(),
       });
-
       await this.userRepository.save(user);
     }
 
     user.lastLogin = new Date();
     await this.userRepository.save(user);
 
-    return user;
+    const token = this.jwtService.sign({ id: user.id, email: user.email });
+
+    return { user, token }; // ✅ Return token here
   } catch (err) {
     console.error('Facebook login error:', err);
     throw new HttpException('Failed to login with Facebook', 401);
   }
 }
+
 async loginWithApple(idToken: string): Promise<User> {
   try {
     const appleUser = await appleSigninAuth.verifyIdToken(idToken, {
