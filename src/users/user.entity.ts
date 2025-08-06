@@ -1,72 +1,99 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Friendship } from '../friendship/friendship.entity'; // Make sure this path is correct
 
 @Entity()
-export class User{
-    @PrimaryGeneratedColumn()
-    id: number;
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-@Column({ nullable: true })
-userType: string;
+  @Column({ nullable: true })
+  userType: string;
 
-@Column({ nullable: true })
-email: string;
+  @Column({ unique: true, nullable: true })
+  email: string;
 
-@Column({ nullable: true })
-phoneNumber:string;
-@Column({ nullable: true }      )
-address:string;
-@Column({ nullable: true }      )
-rank:string;
-@Column({ nullable: true }      )
-scoredPoints: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  deleteAccountToken: string;
 
-totalGamesPlayed: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  deleteTokenExpires: Date;
 
-totalGamesWon: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  phoneNumber: string;
 
-totalGamesLost: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  resetPasswordToken: string;
 
-totalGamesDrawn: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  resetTokenExpires: Date;
 
-totalGamesAbandoned: number; 
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  playerName: string;
 
-userRole: string; // 'admin' | 'user'
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  address: string;
 
-ActiveBets: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  rank: string;
 
-totalBets: number;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  scoredPoints: number;
 
-createdAt: Date;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  totalGamesPlayed: number;
 
-updatedAt: Date;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  totalGamesWon: number;
 
-FullName: string;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  totalGamesLost: number;
 
-password: string;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  totalGamesDrawn: number;
 
-isActive: boolean;
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  totalGamesAbandoned: number;
 
-isVerified: boolean;    
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  userRole: string;
 
-lastLogin: Date;
-@Column({ nullable: true })
-profilePicture: string; // URL or path to the profile picture
-@Column({ nullable: true }      )
+  @Column({ nullable: true })
+  ActiveBets: number;
 
-status: string; // e.g., 'online', 'offline', 'away'
+  @Column({ nullable: true })
+  totalBets: number;
+
+  @Column({ nullable: true })
+  createdAt: Date;
+
+  @Column({ nullable: true })
+  updatedAt: Date;
+
+  @Column({ nullable: true })
+  FullName: string;
+
+  @Column({ nullable: true })
+  password: string;
+
+  @Column({ nullable: true })
+  isActive: boolean;
+
+  @Column({ nullable: true })
+  isVerified: boolean;
+
+  @Column({ nullable: true })
+  lastLogin: Date;
+
+  @Column({ nullable: true })
+  profilePicture: string;
+
+  @Column({ nullable: true })
+  status: string;
+
+  // ✅ ADD THESE RELATIONS
+  @OneToMany(() => Friendship, friendship => friendship.requester)
+  sentRequests: Friendship[];
+
+  @OneToMany(() => Friendship, friendship => friendship.receiver)
+  receivedRequests: Friendship[];
 }

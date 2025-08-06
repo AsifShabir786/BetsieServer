@@ -7,6 +7,8 @@ export class CreateUserDto {
   rank: string;
   scored: number;
   totalGamesPlayed: number;
+  playerName: number;
+
   totalWins: number;
   totalLoss: number;
   userRole: string;

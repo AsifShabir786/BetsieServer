@@ -1,0 +1,10 @@
+node_modules
+dist
+npm-debug.log
+.git
+.gitignore
+.env # Crucial: Do not copy your .env file into the image
+Dockerfile
+docker-compose.yml
+*.log
+.vscode
