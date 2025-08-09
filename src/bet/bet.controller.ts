@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param } from '@nestjs/common';
 import { BetService } from './bet.service';
 
 @Controller('bets')
@@ -34,5 +34,20 @@ export class BetController {
   @Post('decline')
   declineBet(@Body() body: { betId: number; receiverId: number }) {
     return this.betService.declineBet(body.betId, body.receiverId);
+  }
+
+  @Get('pending/:userId')
+  getPendingBets(@Param('userId') userId: number) {
+    return this.betService.getPendingBets(userId);
+  }
+
+  @Get('active/:userId')
+  getActiveBets(@Param('userId') userId: number) {
+    return this.betService.getActiveBets(userId);
+  }
+
+  @Get('completed/:userId')
+  getCompletedBets(@Param('userId') userId: number) {
+    return this.betService.getCompletedBets(userId);
   }
 }

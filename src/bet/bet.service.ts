@@ -17,7 +17,7 @@ export class BetService {
     requesterId: number,
     receiverId: number,
     title: string,
-    description:string | undefined,
+    description: string | undefined,
     stake: number,
     resolutionMethod: string,
     expiresAt: Date
@@ -31,7 +31,7 @@ export class BetService {
 
     const bet = this.betRepository.create({
       title,
-      description,
+      description: description ?? '',
       stake,
       creator: requester,
       opponent: receiver,
@@ -49,10 +49,7 @@ export class BetService {
       relations: ['opponent'],
     });
 
-    if (!bet) {
-      throw new NotFoundException('Bet not found');
-    }
-
+    if (!bet) throw new NotFoundException('Bet not found');
     if (bet.opponent.id !== receiverId) {
       throw new BadRequestException('Only the invited opponent can accept this bet');
     }
@@ -67,15 +64,45 @@ export class BetService {
       relations: ['opponent'],
     });
 
-    if (!bet) {
-      throw new NotFoundException('Bet not found');
-    }
-
+    if (!bet) throw new NotFoundException('Bet not found');
     if (bet.opponent.id !== receiverId) {
       throw new BadRequestException('Only the invited opponent can decline this bet');
     }
 
     bet.status = 'declined';
     return this.betRepository.save(bet);
+  }
+
+  // ✅ Fetch Pending Bets for a User
+  async getPendingBets(userId: number) {
+    return this.betRepository.find({
+      where: [
+        { creator: { id: userId }, status: 'pending' },
+        { opponent: { id: userId }, status: 'pending' }
+      ],
+      relations: ['creator', 'opponent'],
+    });
+  }
+
+  // ✅ Fetch Active Bets for a User
+  async getActiveBets(userId: number) {
+    return this.betRepository.find({
+      where: [
+        { creator: { id: userId }, status: 'accepted' },
+        { opponent: { id: userId }, status: 'accepted' }
+      ],
+      relations: ['creator', 'opponent'],
+    });
+  }
+
+  // ✅ Fetch Completed Bets for a User
+  async getCompletedBets(userId: number) {
+    return this.betRepository.find({
+      where: [
+        { creator: { id: userId }, status: 'completed' },
+        { opponent: { id: userId }, status: 'completed' }
+      ],
+      relations: ['creator', 'opponent'],
+    });
   }
 }

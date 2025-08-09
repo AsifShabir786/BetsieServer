@@ -16,13 +16,13 @@ export class Bet {
   stake: number;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  creator: User; // the one who created the bet
+  creator: User;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  opponent: User; // the one who accepted the bet
+  opponent: User;
 
   @Column({ default: 'pending' })
-  status: 'pending' | 'accepted' | 'declined';
+  status: 'pending' | 'accepted' | 'declined' | 'completed';
 
   @Column({ nullable: true })
   resolutionMethod: string;
