@@ -10,26 +10,27 @@ import { User } from './users/user.entity';
 import { FriendshipModule } from './friendship/friendship.module';
 import { Friendship } from './friendship/friendship.entity';
 
+import { Bet } from './bet/bet.entity'; // ✅ Import Bet entity
+import { BetModule } from './bet/bet.module'; // ✅ Import BetModule
+
 @Module({
   imports: [
-    // ConfigModule.forRoot({ isGlobal: true }), // Loads .env variables globally
-ConfigModule.forRoot({
-  isGlobal: true,
-  envFilePath: process.env.NODE_ENV === 'docker' ? '.env.docker' : '.env.local',
-}),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'docker' ? '.env.docker' : '.env.local',
+    }),
 
-
-    TypeOrmModule.forRootAsync({ // Use forRootAsync to inject ConfigService
+    TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        host: configService.get<string>('DB_HOST'), // Read from environment variable
-        port: configService.get<number>('DB_PORT'), // Read from environment variable
-        username: configService.get<string>('DB_USER'), // Read from environment variable
-        password: configService.get<string>('DB_PASSWORD'), // Read from environment variable
-        database: configService.get<string>('DB_DATABASE'), // Read from environment variable
-        entities: [User,Friendship],
-        synchronize: true, // Set to false in production!
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        entities: [User, Friendship, Bet], // ✅ Added Bet here
+        synchronize: true, // ❗ Set to false in production
       }),
       inject: [ConfigService],
     }),
@@ -37,15 +38,15 @@ ConfigModule.forRoot({
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (config: ConfigService) => ({
-        secret: config.get<string>('ACCESS_TOKEN_SECRET'), // from .env
+        secret: config.get<string>('ACCESS_TOKEN_SECRET'),
         signOptions: { expiresIn: '7d' },
       }),
       inject: [ConfigService],
     }),
 
     UsersModule,
-
     FriendshipModule,
+    BetModule, // ✅ Register Bet module
   ],
   controllers: [AppController],
   providers: [AppService],

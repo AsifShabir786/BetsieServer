@@ -58,12 +58,12 @@ async searchUsers(
 
   return this.usersService.searchUsers(query);
 }
-
+// get all players list route
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
-
+// here route to get detail of speciifc player
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User | null> {
     return this.usersService.findOne(+id);
